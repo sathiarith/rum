@@ -64,14 +64,10 @@ pub fn halt() {
 /// The new segment is mapped as $m[$r[B]].
 pub fn map_seg(um: &mut UniversalMachine, r_b: &u32, r_c: &u32) {
 
-    // new vector of 0s with length r_c
     let r_c_data = um.registers[*r_c as usize];
-    let new_segment = vec![0_u32; r_c_data as usize];
-
-    // Check if we already have any unmapped mem_segs
+    let new_segment = vec![0; r_c_data as usize];
+    // Check if we already have any unmapped mem_segs and if so reuse
     if um.unmap_segs.len() > 0 {
-        // remove it from the unmapped list
-        // update the mem_segs list and r[B]
         let unmapped_seg_index = um.unmap_segs.pop().unwrap();
         um.mem_segs[unmapped_seg_index as usize] = new_segment;
         um.registers[*r_b as usize] = unmapped_seg_index;
@@ -101,10 +97,13 @@ pub fn output(um: &mut UniversalMachine, r_c: &u32) {
 /// of input has been signaled, then $r[C] is loaded
 /// with a full 32-bit word in which every bit is 1.
 pub fn input(um: &mut UniversalMachine, r_c: &u32) {
-    match stdin().bytes().next() {
-        Some(value) => um.registers[*r_c as usize] = value.unwrap() as u32,
-        None => um.registers[*r_c as usize] = 1 as u32
-      }
+    let value = stdin().bytes().next();
+    if let Some(byte) = value {
+        um.registers[*r_c as usize] = byte.unwrap() as u32;
+    } else {
+        um.registers[*r_c as usize] = 1 as u32;
+    }
+
 }
 
 // Segment $m[$r[B]] is duplicated, and the
@@ -114,13 +113,12 @@ pub fn input(um: &mut UniversalMachine, r_c: &u32) {
 // operation should be extremely quick, as this is
 // effectively a jump.
 pub fn load_prog(um: &mut UniversalMachine, r_b: &u32, r_c: &u32) {
-    if um.registers[*r_b as usize] == 0 {
-        um.program_counter = um.registers[*r_c as usize] as usize;
-      }
-      else{
-        *um.mem_segs.get_mut(0).unwrap() = um.mem_segs[um.registers[*r_b as usize] as usize].clone();
-        um.program_counter = um.registers[*r_c as usize] as usize;
-      }
+    if um.registers[*r_b as usize] != 0 {
+        let src_seg = um.mem_segs[um.registers[*r_b as usize] as usize].clone();
+        let dst_seg = um.mem_segs.get_mut(0).unwrap();
+        *dst_seg = src_seg; 
+    }
+    um.program_counter = um.registers[*r_c as usize] as usize;
 }
 
 // $r[A] := value of least significant 25 bits of $r[B]
