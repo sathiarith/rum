@@ -1,0 +1,5 @@
+For number of Instructions:
+valgrind --tool=cachegrind --branch-sim=yes ./target/release/rum ./midmark.um
+
+For visualization:
+samply record ./target/release/rum ./midmark.um
