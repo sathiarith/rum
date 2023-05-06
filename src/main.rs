@@ -2,7 +2,6 @@ use std::env;
 use rum::um::UniversalMachine;
 use rum::rumload;
 use rum::parser;
-//use std::time::Instant;
 
 fn main() {
     let input = env::args().nth(1);
