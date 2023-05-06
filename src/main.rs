@@ -8,6 +8,5 @@ fn main() {
     let input = env::args().nth(1);
     let mut um = UniversalMachine::new();
     um.mem_segs[0] = rumload::load(input.as_deref());
-    // driver
     parser::execute(&mut um);
 }
