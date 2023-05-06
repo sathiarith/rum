@@ -19,11 +19,18 @@ pub fn seg_load(um: &mut UniversalMachine, r_a: &u32, r_b: &u32, r_c: &u32) {
 }
 
 /// Segmented Store: mem[$r[A]][$r[B]] := $r[C]
+// pub fn seg_store(um: &mut UniversalMachine, r_a: &u32, r_b: &u32, r_c: &u32) {
+//     let r_a_data = um.registers[*r_a as usize] as usize;
+//     let r_b_data = um.registers[*r_b as usize] as usize;
+//     let r_c_data = um.registers[*r_c as usize];
+//     um.mem_segs[r_a_data][r_b_data] = r_c_data;
+// }
+// changed to pointer dereferencing instead of indexing to avoid cost of bounds checks
 pub fn seg_store(um: &mut UniversalMachine, r_a: &u32, r_b: &u32, r_c: &u32) {
-    let r_a_data = um.registers[*r_a as usize] as usize;
-    let r_b_data = um.registers[*r_b as usize] as usize;
-    let r_c_data = um.registers[*r_c as usize];
-    um.mem_segs[r_a_data][r_b_data] = r_c_data;
+    let r_a_data = *um.registers.get(*r_a as usize).unwrap() as usize;
+    let r_b_data = *um.registers.get(*r_b as usize).unwrap() as usize;
+    let r_c_data = *um.registers.get(*r_c as usize).unwrap();
+    *um.mem_segs.get_mut(r_a_data).unwrap().get_mut(r_b_data).unwrap() = r_c_data;
 }
 
 /// Addition: $r[A] := ($r[B] + $r[C]) mod 2^32
