@@ -44,7 +44,12 @@ pub fn get(field: &Field, instruction: &Umi) -> u32 {
 pub fn op(instruction: Umi) -> u32 {
     (instruction >> OP.lsb) & mask(OP.width)
 }
-
+pub fn execute(um: &mut UniversalMachine) {
+    // driver
+    loop {
+        parse(um);
+    } 
+}
 pub fn parse(um: &mut UniversalMachine) {
     let inst = um.mem_segs.get(0).unwrap().get(um.program_counter).unwrap();
     um.program_counter += 1;
