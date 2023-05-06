@@ -1,10 +1,10 @@
 use crate::parser::*;
 use crate::um::UniversalMachine;
-//use std::io::*;
+use std::io::*;
 use std::process;
 use std::vec;
 
-use std::io::{self, Read}; // for input revision
+// use std::io::{self, Read}; // for input revision
 
 /// Conditional Move: if $r[C] 6= 0 then $r[A] := $r[B]
 pub fn cmov(um: &mut UniversalMachine, r_a: &u32, r_b: &u32, r_c: &u32) {
@@ -112,27 +112,27 @@ pub fn output(um: &mut UniversalMachine, r_c: &u32) {
 /// which must be a value from 0 to 255. If the end
 /// of input has been signaled, then $r[C] is loaded
 /// with a full 32-bit word in which every bit is 1.
-// pub fn input(um: &mut UniversalMachine, r_c: &u32) {
-//     let value = stdin().bytes().next();
-//     if let Some(byte) = value {
-//         um.registers[*r_c as usize] = byte.unwrap() as u32;
-//     } else {
-//         um.registers[*r_c as usize] = 1 as u32;
-//     }
+pub fn input(um: &mut UniversalMachine, r_c: &u32) {
+    let value = stdin().bytes().next();
+    if let Some(byte) = value {
+        um.registers[*r_c as usize] = byte.unwrap() as u32;
+    } else {
+        um.registers[*r_c as usize] = 1 as u32;
+    }
 
-// }
+}
 
 
 // using read() instead of bytes() to read one byte at a time
-pub fn input(um: &mut UniversalMachine, r_c: &u32) {
-    let mut buffer = [0; 1]; // read one byte at a time
-    let result = io::stdin().read(&mut buffer);
-    match result {
-        Ok(0) => um.registers[*r_c as usize] = 1, // EOF
-        Ok(_) => um.registers[*r_c as usize] = buffer[0] as u32,
-        Err(_) => um.registers[*r_c as usize] = 1, // error
-    }
-}
+// pub fn input(um: &mut UniversalMachine, r_c: &u32) {
+//     let mut buffer = [0; 1]; // read one byte at a time
+//     let result = io::stdin().read(&mut buffer);
+//     match result {
+//         Ok(0) => um.registers[*r_c as usize] = 1, // EOF
+//         Ok(_) => um.registers[*r_c as usize] = buffer[0] as u32,
+//         Err(_) => um.registers[*r_c as usize] = 1, // error
+//     }
+// }
 
 
 // Segment $m[$r[B]] is duplicated, and the
